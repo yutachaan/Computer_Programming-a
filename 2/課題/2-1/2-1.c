@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define BUFFER 512
+
 // 文字列sの長さを返す
 int size_s(char *s) {
   int ret = 0;
@@ -28,7 +30,7 @@ void reverse(char *s) {
 
 int main(int argc, char *argv[]) {
   FILE *file;
-  char buf[512];
+  char buf[BUFFER];
 
   if ((file = fopen(argv[1], "r")) == NULL) exit(1);
 

@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define BUFFER 512
+
 // 文字列sの中に文字列tがいくつ含まれるのかをカウント
 int count_string(char *s, char *t) {
   int ret = 0;
@@ -22,7 +24,7 @@ int count_string(char *s, char *t) {
 
 int main(int argc, char *argv[]) {
   FILE *file;
-  char buf[512];
+  char buf[BUFFER];
 
   if ((file = fopen(argv[1], "r")) == NULL) exit(1);
 
