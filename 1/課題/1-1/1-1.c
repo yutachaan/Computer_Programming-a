@@ -6,15 +6,13 @@ int main() {
 
   char c;
   while((c = getchar()) != EOF) {
-    if (!isprint(c)) continue;
-
-    int n = (unsigned char)c;
-    count[n]++;
+    if (isprint(c)) {
+      int cn = (unsigned char)c;
+      count[cn]++;
+    }
   }
 
   for (int i = 0; i <= 128; i++) {
-    if (!isprint(i)) continue;
-
-    printf("\'%c\' : %d\n", i, count[i]);
+    if (isprint(i)) printf("\'%c\' : %d\n", i, count[i]);
   }
 }

@@ -10,25 +10,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// 文字列sの中に文字列tがいくつ含まれるのかをカウント
-int count_string(char *s, char *t) {
+// 文字列sの長さを返す
+int size_s(char *s) {
   int ret = 0;
 
-  // sを1文字ずつ見る
-  for (int i = 0; s[i] != '\0'; i++) {
-    int flag = 1; // s[i]〜s[i + size(t)]が文字列tと等しいか
-    for (int j = 0; t[j] != '\0'; j++) {
-      if (s[i + j] != t[j]) {
-        flag = 0;
-        break;
-      }
-    }
+  // 文字列の最後には\0(ヌル文字)が入っているため，それが見つかるまでカウントアップ
+  while (*s++ != '\0')ret++;
 
-    // 等しかったらカウント
-    if (flag) ret++;
+  return ret - 1;
+}
+
+// 文字列sをreverse
+void reverse(char *s) {
+  int size = size_s(s);
+
+  // i文字目とsize-i-1文字目をswap (0-indexed)
+  for (int i = 0; i < size / 2; i++) {
+    char temp = s[i];
+    s[i] = s[size - 1 - i];
+    s[size - 1 - i] = temp;
   }
 
-  return ret;
+  return;
 }
 
 
@@ -38,19 +41,14 @@ int main(int argc, char *argv[]) {
 
   if ((file = fopen(argv[1], "r")) == NULL) exit(1);
 
-  // 1行ずつ読み込んでそれぞれカウント
-  int count_Alice = 0, count_wonder = 0, count_self = 0;
+  // 1行ずつ読み込み，reverseして出力
   while(fgets(buf,sizeof(buf), file) != NULL) {
-    count_Alice += count_string(buf, "Alice");
-    count_wonder += count_string(buf, "wonder");
-    count_self += count_string(buf, "self");
+    reverse(buf);
+
+    printf("%s", buf);
   }
 
   fclose(file);
-
-  printf("Alice: %d\n", count_Alice);
-  printf("wonder: %d\n", count_wonder);
-  printf("self: %d\n", count_self);
 }
 
 

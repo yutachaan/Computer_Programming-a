@@ -1,4 +1,4 @@
-# include<stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 // 文字列sの長さを返す
@@ -30,9 +30,9 @@ int main(int argc, char *argv[]) {
   FILE *file;
   char buf[512];
 
-  // 開けなかったら終了
   if ((file = fopen(argv[1], "r")) == NULL) exit(1);
 
+  // 1行ずつ読み込み，reverseして出力
   while(fgets(buf,sizeof(buf), file) != NULL) {
     reverse(buf);
 

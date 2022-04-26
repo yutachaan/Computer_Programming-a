@@ -16,15 +16,12 @@ int count_string(char *s, char *t) {
 
   // sを1文字ずつ見る
   for (int i = 0; s[i] != '\0'; i++) {
-    int flag = 1; // s[i]〜s[i + size(t)]が文字列tと等しいか
+    int flag = 1; // s[i] + s[i + 1] + ... + s[i + size(t)]が文字列tと等しいか
     for (int j = 0; t[j] != '\0'; j++) {
-      if (s[i + j] != t[j]) {
-        flag = 0;
-        break;
-      }
+      if (s[i + j] != t[j]) flag = 0;
     }
 
-    // 等しかったらカウント
+    // 等しかったらカウントアップ
     if (flag) ret++;
   }
 
@@ -38,7 +35,7 @@ int main(int argc, char *argv[]) {
 
   if ((file = fopen(argv[1], "r")) == NULL) exit(1);
 
-  // 1行ずつ読み込んでそれぞれカウント
+  // 1行ずつ読み込んでそれぞれの出現回数をカウント
   int count_Alice = 0, count_wonder = 0, count_self = 0;
   while(fgets(buf,sizeof(buf), file) != NULL) {
     count_Alice += count_string(buf, "Alice");
@@ -52,6 +49,7 @@ int main(int argc, char *argv[]) {
   printf("wonder: %d\n", count_wonder);
   printf("self: %d\n", count_self);
 }
+
 
 
 /*
