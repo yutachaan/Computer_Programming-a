@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 // データの特徴次元毎の平均からなる平均ベクトルを計算
 double *get_mean(int ndim, double **data, int ndata) {
   // 領域確保
@@ -17,6 +16,34 @@ double *get_mean(int ndim, double **data, int ndata) {
   return ret;
 }
 
+// 特徴次元間の分散共分散行列を計算
+double **get_cova(int ndim, double **data, int ndata) {
+  // 領域確保
+  double *mean;
+  if ((mean = (double*)malloc(ndim * sizeof(double))) == NULL) exit(1);
+
+  double **ret;
+  if ((ret = (double**)malloc(ndim * sizeof(double*))) == NULL) exit(1);
+  for (int i = 0; i < ndim; i++) {
+    if ((ret[i] = (double*)malloc(ndim * sizeof(double))) == NULL) exit(1);
+  }
+
+  // 平均を求める
+  mean = get_mean(ndim, data, ndata);
+
+  // 分散共分散行列を求める
+  for (int i = 0; i < ndim; i++) {
+    for (int j = 0; j < ndim; j++) {
+      for (int k = 0; k < ndata; k++) {
+        ret[i][j] += (data[k][i] - mean[i]) * (data[k][j] - mean[j]);
+      }
+      ret[i][j] /= ndata;
+    }
+  }
+
+  return ret;
+}
+
 
 int main(int argc, char *argv[]) {
   FILE *file;
@@ -26,12 +53,14 @@ int main(int argc, char *argv[]) {
   int ndata, ndim;
   fscanf(file, "%d %d\n", &ndata, &ndim);
 
-  // データの領域確保
+
+  // 領域確保
   double **data;
   if ((data = (double**)malloc(ndata * sizeof(double*))) == NULL) exit(1);
   for (int i = 0; i < ndata; i++) {
     if ((data[i] = (double*)malloc(ndim * sizeof(double))) == NULL) exit(1);
   }
+
 
   // データを入力
   for (int i = 0; i < ndata; i++) {
@@ -48,10 +77,32 @@ int main(int argc, char *argv[]) {
 
   mean = get_mean(ndim, data, ndata);
 
+  printf("mean: \n");
   for (int j = 0; j < ndim; j++) printf("%lf\n", mean[j]);
+  printf("\n");
+
+  free(mean);
 
 
-  // メモリ解放
+  // 分散共分散行列を求める
+  double **cova;
+  if ((cova = (double**)malloc(ndim * sizeof(double*))) == NULL) exit(1);
+  for (int i = 0; i < ndim; i++) {
+    if ((cova[i] = (double*)malloc(ndim * sizeof(double))) == NULL) exit(1);
+  }
+
+  cova = get_cova(ndim, data, ndata);
+
+  printf("cova: \n");
+  for (int i = 0; i < ndim; i++) {
+    for (int j = 0; j < ndim - 1; j++) printf("%lf ", cova[i][j]);
+    printf("%lf\n", cova[i][ndim - 1]);
+  }
+
+  for (int i = 0; i < ndim; i++) free(cova[i]);
+  free(cova);
+
+
   for (int i = 0; i < ndata; i++) free(data[i]);
   free(data);
 }
