@@ -13,6 +13,7 @@
 
 typedef double (*P_FUNC)(double);
 
+
 // target function 1
 double f1(double x) {
   return x * x;
@@ -35,14 +36,14 @@ double trapezoid(double w1, double w2, double h) {
 
 // 台形法により一変数関数の積分値を計算
 double integral(double x1, double x2, int n, P_FUNC funcptr) {
-  double ret, h = (x2 - x1) / n;
+  double value, h = (x2 - x1) / n;
 
   for (int c = 0; c < n; c++) {
-    ret += trapezoid(funcptr(x1), funcptr(x1 + h), h);
+    value += trapezoid(funcptr(x1), funcptr(x1 + h), h);
     x1 += h;
   }
 
-  return ret;
+  return value;
 }
 
 
