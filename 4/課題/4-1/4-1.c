@@ -50,12 +50,13 @@ BTREE insertNode(BTREE node, char *word) {
 }
 
 // 2分木を表示
-void printBtree(BTREE p, int i) {
+int n; // 通し番号用
+void printBtree(BTREE p) {
   if (p == NULL) return;
 
-  printBtree(p->left, i);
-  printf("%d: WORD: %s, COUNT: %d\n", i, p->word, p->count);
-  printBtree(p->right, ++i);
+  printBtree(p->left);
+  printf("%d: WORD: %s, COUNT: %d\n", ++n, p->word, p->count);
+  printBtree(p->right);
 
   return;
 }
@@ -108,7 +109,7 @@ int main(int argc, char *argv[]) {
   }
 
   // 2分木を出力
-  printBtree(btree, 1);
+  printBtree(btree);
 
   // メモリ解放
   freeBtree(btree);
