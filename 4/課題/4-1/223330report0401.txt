@@ -13,6 +13,7 @@
 
 #define STRLEN 256
 
+
 // ノードの定義
 typedef struct node {
   char word[STRLEN];  // 単語(key)
@@ -20,7 +21,6 @@ typedef struct node {
   struct node *left;  // 左部分木
   struct node *right; // 右部分木
 } NODE, *BTREE;
-
 
 // ノードのメモリを確保し，値を代入
 BTREE mallocNode(char *word) {
@@ -41,9 +41,7 @@ BTREE mallocNode(char *word) {
 }
 
 // 2分木にノードを挿入
-BTREE insertNode(BTREE node, char *word) {
-  BTREE p = node;
-
+BTREE insertNode(BTREE p, char *word) {
   // pが空なら， rootを挿入
   if (p == NULL) {
     p = mallocNode(word);
@@ -53,7 +51,7 @@ BTREE insertNode(BTREE node, char *word) {
   int cmp = strcmp(word, p->word);
   if (cmp <= -1) p->left = insertNode(p->left, word);       // 追加したいwordのほうが辞書順で小さい場合は左部分木に追加
   else if (cmp >= 1) p->right = insertNode(p->right, word); // 大きい場合は右部分木に追加
-  else p->count++; // 等しい場合はカウントアップ
+  else p->count++;                                          // 等しい場合はカウントアップ
 
   return p;
 }
@@ -66,8 +64,6 @@ void printBtree(BTREE p) {
   printBtree(p->left);
   printf("%d: WORD: %s, COUNT: %d\n", ++n, p->word, p->count);
   printBtree(p->right);
-
-  return;
 }
 
 // 2分木のメモリ解放
@@ -77,26 +73,24 @@ void freeBtree(BTREE p) {
   freeBtree(p->left);
   freeBtree(p->right);
   free(p);
-
-  return;
 }
 
 // 文字列を分割してresultに格納し， 分割後の文字列の個数を返す(s: 対象文字列， separator: 区切り文字の配列， result: 結果を格納する文字列配列，)
 int split(char *s, const char *separator, char **result) {
-    if (s == NULL) return 0;
+  if (s == NULL) return 0;
 
-    int count = 0;
+  int count = 0;
 
-    // 文字列を分割してカウント
-    char *p = strtok(s, separator);
-    while (p != NULL) {
-      result[count] = p;
-      count++;
+  // 文字列を分割してカウント
+  char *p = strtok(s, separator);
+  while (p != NULL) {
+    result[count] = p;
+    count++;
 
-      p = strtok(NULL, separator);
-    }
+    p = strtok(NULL, separator);
+  }
 
-    return count;
+  return count;
 }
 
 
