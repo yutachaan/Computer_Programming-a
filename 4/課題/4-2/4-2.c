@@ -13,37 +13,41 @@ typedef struct list {
   struct list *next;  // 次の要素へのポインタ
 } LIST, *LISTP;
 
-// リストの末尾にノードを追加
-void appendList(LIST **head, char *word) {
-  LISTP new, p = *head, prev;
+// ノードのメモリを確保し，値を代入
+LISTP mallocNode(char *word) {
+  LISTP p;
 
-  // 追加する要素のメモリ確保
-  if ((new = (LISTP)malloc(sizeof(LIST))) == NULL) {
+  // メモリ確保
+  if ((p = (LISTP)malloc(sizeof(LIST))) == NULL) {
     printf("Memory Allocation Error\n");
     exit(EXIT_FAILURE);
   }
 
-  // 値を代入
-  strcpy(new->word, word);
-  new->count = 1;
-  new->next = NULL;
+  // 値の代入
+  strcpy(p->word, word);
+  p->count = 1;
+  p->next = NULL;
 
-  // 末尾までポインタを移動
-  while (p != NULL) {
-    prev = p;
-    p = p->next;
+  return p;
+}
+
+// リストの末尾にノードを追加
+LISTP appendList(LISTP head, char *word) {
+  LISTP new, p = head;
+
+  if (p == NULL) {
+    p = mallocNode(word);
+    return p;
   }
 
-  if (p == *head) *head = new; // 追加する位置が先頭の場合，そのまま先頭に設定
-  else prev->next = new;     // それ以外の場合は今の末尾の要素の次に追加
+  if (strcmp(word, p->word) == 0) p->count++; // 等しい場合はカウントアップ
+  else p->next = appendList(p->next, word);   // それ以外の場合は次の要素へ
 
-  return;
+  return p;
 }
 
 // リストの要素を順に表示
-void printList(LIST **head) {
-  LISTP p = *head;
-
+void printList(LISTP p) {
   int n = 1;
   while (p != NULL) {
     printf("%d: WORD: %s, COUNT: %d\n", n, p->word, p->count);
@@ -56,12 +60,10 @@ void printList(LIST **head) {
 }
 
 // リストのメモリ解放
-void freeList(LIST **head) {
-  LISTP p = *head;
-
+void freeList(LISTP p) {
   if (p == NULL) return;
 
-  freeList(&p->next);
+  freeList(p->next);
   free(p);
 
   return;
@@ -102,14 +104,14 @@ int main(int argc, char *argv[]) {
     int count = split(str, " \n", result); // 空白と改行コードでsplit
 
     // 線形リストに追加
-    for (int i = 0; i < count; i++) appendList(&list, result[i]);
+    for (int i = 0; i < count; i++) list = appendList(list, result[i]);
   }
 
   // 線形リストを順に出力
-  printList(&list);
+  printList(list);
 
   // メモリ解放
-  freeList(&list);
+  freeList(list);
 
   fclose(file);
 }
