@@ -19,7 +19,7 @@ void appendList(LIST **head, char *word) {
 
   // メモリ確保
   if ((new = (LISTP)malloc(sizeof(LIST))) == NULL) {
-    printf("Memory Allocation Error\n");
+    perror("Memory Allocation Error");
     exit(EXIT_FAILURE);
   }
 
@@ -28,7 +28,7 @@ void appendList(LIST **head, char *word) {
   new->count = 1;
   new->next = NULL;
 
-  // まだ要素が1つもないなら先頭に追加
+  // まだ要素が1つもないなら先頭に追加して終了
   if (p == NULL) {
     *head = new;
     return;
@@ -36,7 +36,7 @@ void appendList(LIST **head, char *word) {
 
   // 末尾までポインタを移動
   while (p != NULL) {
-    // すでに登録されているならカウントアップ
+    // すでに登録されているならカウントアップして終了
     if (strcmp(p->word, word) == 0) {
       p->count++;
       return;
@@ -84,7 +84,7 @@ void insertHash(LIST **hash_table, char *word) {
   int h = hash(word);
 
   if (h >= HASHSIZE) {
-    printf("Hash Value Error\n");
+    perror("Hash Value Error");
     exit(EXIT_FAILURE);
   }
 
@@ -131,7 +131,7 @@ int split(char *s, const char *separator, char **result) {
 int main(int argc, char *argv[]) {
   FILE *file;
   if ((file = fopen(argv[1], "r")) == NULL) {
-    printf("File Open Error: %s\n", file);
+    perror("File Open Error");
     exit(EXIT_FAILURE);
   }
 
@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
   // 線形リストを順に出力
   printHash(hash_table);
 
-  // メモリ解放
+  // ハッシュテーブルのメモリ解放
   freeHash(hash_table);
 
   fclose(file);
