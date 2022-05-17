@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 #define STRLEN 256
 
 
@@ -19,7 +20,7 @@ BTREE mallocNode(char *word) {
 
   // メモリ確保
   if ((p = (BTREE)malloc(sizeof(NODE))) == NULL) {
-    printf("Memory Allocation Error\n");
+    perror("Memory Allocation Error");
     exit(EXIT_FAILURE);
   }
 
@@ -88,7 +89,7 @@ int split(char *s, const char *separator, char **result) {
 int main(int argc, char *argv[]) {
   FILE *file;
   if ((file = fopen(argv[1], "r")) == NULL) {
-    printf("File Open Error: %s\n", file);
+    perror("File Open Error");
     exit(EXIT_FAILURE);
   }
 
@@ -106,8 +107,10 @@ int main(int argc, char *argv[]) {
   // 2分木を出力
   printBtree(btree);
 
-  // メモリ解放
+  // 2分木のメモリ解放
   freeBtree(btree);
 
   fclose(file);
+
+  return 0;
 }
