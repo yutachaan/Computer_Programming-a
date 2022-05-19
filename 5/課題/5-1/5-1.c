@@ -1,15 +1,20 @@
+// 三角形のデータをN個ランダムに作成して線形リストに保持し，それらのデータをPostscript形式に変換する
+// % gcc -o 5-1 5-1.c
+// ./5-1 [出力ファイル名] [N]
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
-
+// 三角形の構造体
 typedef struct Triangle {
   double x1, y1, x2, y2, x3, y3, R, G, B;
 } TRG, *TRGP;
 
+// 線形リストの構造体
 typedef struct list {
-  TRG trg;
-  struct list *next;
+  TRG trg;           // 三角形のデータ
+  struct list *next; // 次のノード
 } LIST, *LISTP;
 
 // min〜maxのdoubleの乱数を生成する
@@ -55,20 +60,24 @@ void appendList(LIST **head) {
     return;
   }
 
-  // 末尾までポインタを移動
+  // 末尾の要素の次の位置に追加
   while (p != NULL) {
     prev = p;
     p = p->next;
   }
-
-  // 末尾の要素の次の位置に追加
   prev->next = new;
 }
 
 // リストの要素を順に表示
-void printList(LISTP p) {
+void outputPS(LISTP p, FILE* fp) {
   while (p != NULL) {
-    printf("v1=(%.5lf, %.5lf), v2=(%.5lf, %.5lf), v3=(%.5lf, %.5lf) color(%.5lf, %.5lf, %.5lf)\n", p->trg.x1, p->trg.y1, p->trg.x2, p->trg.y2, p->trg.x3, p->trg.y3, p->trg.R, p->trg.G, p->trg.B);
+    fprintf(fp, "newpath\n");
+    fprintf(fp, "%lf %lf %lf setrgbcolor\n", p->trg.R, p->trg.G, p->trg.B);
+    fprintf(fp, "%lf %lf moveto\n", p->trg.x1, p->trg.y1);
+    fprintf(fp, "%lf %lf lineto\n", p->trg.x2, p->trg.y2);
+    fprintf(fp, "%lf %lf lineto\n", p->trg.x3, p->trg.y3);
+    fprintf(fp, "closepath\n");
+    fprintf(fp, "stroke\n\n");
 
     p = p->next;
   }
@@ -83,17 +92,31 @@ void freeList(LISTP p) {
 }
 
 
-int main() {
-  int N = 100;
+int main(int argc, char *argv[]) {
+  FILE *file;
+  if ((file = fopen(argv[1], "w")) == NULL) {
+    perror("File Open Error");
+    exit(EXIT_FAILURE);
+  }
+
+  // Nはコマンドライン引数で指定
+  int N = atoi(argv[2]);
 
   srand((unsigned int)time(NULL));
 
+  // N個の三角形を生成して線形リストに格納
   LISTP trgList = NULL;
   for(int i = 0; i < N; i++) appendList(&trgList);
 
-  printList(trgList);
+  // psファイルへ出力
+  fprintf(file, "%%!PS\n");
+  outputPS(trgList, file);
+  fprintf(file, "showpage\n");
 
+  // 線形リストのメモリ解放
   freeList(trgList);
+
+  fclose(file);
 
   return 0;
 }
