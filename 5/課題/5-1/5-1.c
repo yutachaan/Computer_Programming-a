@@ -19,10 +19,11 @@ typedef struct Triangle {
 } TRG, *TRGP;
 
 // 三角形のデータを格納する線形リストの構造体
-typedef struct list {
+typedef struct node {
   TRG trg;
-  struct list *next;
-} LIST, *LISTP;
+  struct node *next;
+} NODE, *NODEP;
+
 
 // 閉区間[min_rand, max_rand]から実数の乱数を生成して返す
 double GenerateRand(double min_rand, double max_rand) {
@@ -46,34 +47,45 @@ TRG GenerateTRG(double coord_min, double coord_max) {
   return trg;
 }
 
-// 三角形のデータtrgを持つノードをリストの末尾に追加
-void AppendNodeToList(LIST **head, TRG trg) {
-  LISTP new, p = *head, prev;
 
-  if ((new = (LISTP)malloc(sizeof(LIST))) == NULL) {
+// エラー処理を含めたmalloc()関数
+void *MyMalloc(size_t size) {
+  void *p;
+
+  if ((p = malloc(size)) == NULL) {
     perror("Memory Allocation Error");
     exit(EXIT_FAILURE);
   }
 
-  new->trg = trg;
-  new->next = NULL;
+  return p;
+}
 
-  // まだノードが1つもないなら先頭に追加して終了
+// 追加するノードのメモリ領域を確保して値を代入
+NODEP MallocNode(TRG trg) {
+  NODEP p = (NODEP)MyMalloc(sizeof(NODE));
+
+  p->trg = trg;
+  p->next = NULL;
+
+  return p;
+}
+
+// 三角形のデータtrgを持つノードをリストの末尾に追加
+NODEP AppendNodeToList(NODEP p, TRG trg) {
+  // 末尾まできたらノードを追加
   if (p == NULL) {
-    *head = new;
-    return;
+    p = MallocNode(trg);
+    return p;
   }
 
-  // 末尾へノードを追加
-  while (p != NULL) {
-    prev = p;
-    p = p->next;
-  }
-  prev->next = new;
+  // AppendNodeToList()を再帰的に呼び出して末尾まで移動
+  p->next = AppendNodeToList(p->next, trg);
+
+  return p;
 }
 
 // リストのもつ三角形のデータを順にPostScript形式に変換しファイルに出力
-void OutputToPS(LISTP p, FILE *fp) {
+void OutputToPS(NODEP p, FILE *fp) {
   while (p != NULL) {
     // 描画セットの開始
     fprintf(fp, "newpath\n");
@@ -95,7 +107,7 @@ void OutputToPS(LISTP p, FILE *fp) {
 }
 
 // リストのメモリを解放
-void FreeList(LISTP p) {
+void FreeList(NODEP p) {
   if (p == NULL) return;
 
   FreeList(p->next);
@@ -115,8 +127,8 @@ int main(int argc, char *argv[]) {
   srand((unsigned int)time(NULL));
 
   // N個の三角形を生成して順に線形リストに格納
-  LISTP trgList = NULL;
-  for(int i = 0; i < N; i++) AppendNodeToList(&trgList, GenerateTRG(50, 550));
+  NODEP trgList = NULL;
+  for(int i = 0; i < N; i++) trgList = AppendNodeToList(trgList, GenerateTRG(50, 550));
 
   // PostScript形式のファイルへ出力
   fprintf(fp, "%%!PS\n");    // PostScriptファイルの識別子
