@@ -1,4 +1,13 @@
 /*
+ * 科目：ソフトウェア演習Ⅰa
+ * 学籍番号・氏名：B223330・佐藤 優太
+ * 課題番号：課題6-1
+ * 提出日：2022年5月31日
+ * 使用コンパイラ：gcc version 11.3.0
+*/
+
+
+/*
   力まかせ法とBM法による文字列検索の速度比較
 
   @author: Yuta Sato
@@ -113,3 +122,59 @@ int main(int argc, char *argv[]) {
 
   return 0;
 }
+
+
+/*
+実行結果:
+% gcc -o 6-1 6-1.c
+% ./6-1 Alice_in_Wonderland.txt Alice
+Brute Force Method:
+"Alice" found 395 times!
+Used CPU time: 0.0010600000
+
+BM Method:
+"Alice" found 395 times!
+Used CPU time: 0.0003520000
+
+
+% ./6-1 Alice_in_Wonderland.txt a
+Brute Force Method:
+"a" found 8153 times!
+Used CPU time: 0.0013260000
+
+BM Method:
+"a" found 8153 times!
+Used CPU time: 0.0018770000
+
+
+% ./6-1 Alice_in_Wonderland.txt aa
+Brute Force Method:
+"aa" found 0 times!
+Used CPU time: 0.0011410000
+
+BM Method:
+"aa" found 0 times!
+Used CPU time: 0.0009770000
+
+
+% ./6-1 Alice_in_Wonderland.txt aaaa
+Brute Force Method:
+"aaaa" found 0 times!
+Used CPU time: 0.0011540000
+
+BM Method:
+"aaaa" found 0 times!
+Used CPU time: 0.0004860000
+
+
+% ./6-1 Alice_in_Wonderland.txt aaaa
+Brute Force Method:
+"aaaaaaaa" found 0 times!
+Used CPU time: 0.0011390000
+
+BM Method:
+"aaaaaaaa" found 0 times!
+Used CPU time: 0.0002440000
+
+速度比較の結論: 文字列が短い場合，特に1文字の場合については，力まかせ法のほうが速い．しかし，文字数が増えていくにつれてBM法の速度が上がるのに対して，力まかせ法の速度はほとんど変化していない．したがって，平均的に考えて，実用上はBM法のほうが速度が速いと言える．
+*/
