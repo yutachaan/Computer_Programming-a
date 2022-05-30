@@ -36,22 +36,24 @@ void *MyMalloc(size_t size) {
   return p;
 }
 
-// 力まかせ法による文字列検索をおこない， textに含まれるpatternの個数を調べる
+// 力まかせ法による文字列検索をおこない， textに含まれるpatternの個数を調べる．また，文字列検索にかかった時間を出力する．
 void BruteForce(int filesize, char *text, char *pattern) {
   int count = 0, pattern_len = strlen(pattern);
 
   clock_t t1 = clock(); // 計測開始
+
   // 先頭から探索し， text[i, ..., i+pattern_len]とpatternが一致したらカウントアップ
   for (int i = 0; i < filesize; i++) {
     if (strncmp(text + i, pattern, pattern_len) == 0) count++;
   }
+
   clock_t t2 = clock(); // 計測終了
 
   printf("\"%s\" found %d times!\n", pattern, count);
   printf("Used CPU time: %.10f\n", (double)(t2 - t1) / CLOCKS_PER_SEC);
 }
 
-// BM法による文字列検索をおこない， textに含まれるpatternの個数を調べる
+// BM法による文字列検索をおこない， textに含まれるpatternの個数を調べる．また，文字列検索にかかった時間を出力する．
 void BM(int filesize, char *text, char *pattern) {
   int count = 0, pattern_len = strlen(pattern);
   int skip[UCHAR_MAX]; // スキップテーブル
@@ -59,8 +61,8 @@ void BM(int filesize, char *text, char *pattern) {
   clock_t t1 = clock(); // 計測開始
 
   // スキップテーブルの作成
-  for (int c = 0; c < UCHAR_MAX; c++) skip[c] = pattern_len; // パターン内に存在しない場合のスキップ数
-  for (int i = 0; i < pattern_len; i++) skip[pattern[i]] = pattern_len - i - 1; // パターン内に存在する場合のスキップ数(pattern内に同じ文字が複数存在する場合は後ろ側の位置に合わせる)
+  for (int c = 0; c < UCHAR_MAX; c++) skip[c] = pattern_len; // パターン内に存在しない場合
+  for (int i = 0; i < pattern_len; i++) skip[pattern[i]] = pattern_len - i - 1; // パターン内に存在する場合(pattern内に同じ文字が複数存在する場合は後ろ側の位置に合わせる)
 
   int tpos = pattern_len - 1, ppos = pattern_len - 1; // tpos: テキストの比較位置， ppos: パターンの比較位置． それぞれパターンの末尾のインデックスにする
   while (tpos < filesize) {
@@ -96,7 +98,7 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  // ファイルサイズを測る
+  // ファイルサイズを計測する
   fpos_t filesize;
   fseek(fp, 0, SEEK_END);
   fgetpos(fp, &filesize);
