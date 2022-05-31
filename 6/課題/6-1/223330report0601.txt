@@ -24,6 +24,18 @@
 #include <time.h>
 #include <limits.h>
 
+// エラー処理を含めたfopen()関数
+FILE *MyFopen(char *filename, char *mode) {
+  FILE *fp;
+
+  if ((fp = fopen(filename, mode)) == NULL) {
+    perror("File Open Error");
+    exit(EXIT_FAILURE);
+  }
+
+  return fp;
+}
+
 // エラー処理を含めたmalloc()関数
 void *MyMalloc(size_t size) {
   void *p;
@@ -36,15 +48,16 @@ void *MyMalloc(size_t size) {
   return p;
 }
 
+
 // 力まかせ法による文字列検索をおこない， textに含まれるpatternの個数を調べる．また，文字列検索にかかった時間を出力する．
 void BruteForce(int filesize, char *text, char *pattern) {
-  int count = 0, pattern_len = strlen(pattern);
+  int count = 0, len_pattern = strlen(pattern);
 
   clock_t t1 = clock(); // 計測開始
 
-  // 先頭から探索し， text[i, ..., i+pattern_len]とpatternが一致したらカウントアップ
+  // 先頭から探索し， text[i, ..., i+len_pattern]とpatternが一致したらカウントアップ
   for (int i = 0; i < filesize; i++) {
-    if (strncmp(text + i, pattern, pattern_len) == 0) count++;
+    if (strncmp(text + i, pattern, len_pattern) == 0) count++;
   }
 
   clock_t t2 = clock(); // 計測終了
@@ -55,16 +68,16 @@ void BruteForce(int filesize, char *text, char *pattern) {
 
 // BM法による文字列検索をおこない， textに含まれるpatternの個数を調べる．また，文字列検索にかかった時間を出力する．
 void BM(int filesize, char *text, char *pattern) {
-  int count = 0, pattern_len = strlen(pattern);
+  int count = 0, len_pattern = strlen(pattern);
   int skip[UCHAR_MAX]; // スキップテーブル
 
   clock_t t1 = clock(); // 計測開始
 
   // スキップテーブルの作成
-  for (int c = 0; c < UCHAR_MAX; c++) skip[c] = pattern_len; // パターン内に存在しない場合
-  for (int i = 0; i < pattern_len; i++) skip[pattern[i]] = pattern_len - i - 1; // パターン内に存在する場合(pattern内に同じ文字が複数存在する場合は後ろ側の位置に合わせる)
+  for (int c = 0; c < UCHAR_MAX;   c++) skip[c]          = len_pattern;         // パターン内に存在しない場合
+  for (int i = 0; i < len_pattern; i++) skip[pattern[i]] = len_pattern - i - 1; // パターン内に存在する場合(pattern内に同じ文字が複数存在する場合は後ろ側の位置に合わせる)
 
-  int tpos = pattern_len - 1, ppos = pattern_len - 1; // tpos: テキストの比較位置， ppos: パターンの比較位置． それぞれパターンの末尾のインデックスにする
+  int tpos = len_pattern - 1, ppos = len_pattern - 1; // tpos: テキストの比較位置， ppos: パターンの比較位置． それぞれパターンの末尾のインデックスにする
   while (tpos < filesize) {
     while (text[tpos] == pattern[ppos]) {
       // パターンの先頭の文字までテキストの文字が一致した場合
@@ -78,10 +91,10 @@ void BM(int filesize, char *text, char *pattern) {
       ppos--;
     }
 
-    if (skip[text[tpos]] > pattern_len - 1 - ppos) tpos += skip[text[tpos]]; // 次回の比較位置が前回の比較開始位置よりも後ろに移動する場合はスキップテーブルに従い移動
-    else tpos += pattern_len - ppos; // 前に移動してしまう場合は前回の比較開始位置から1文字だけスキップ
+    if (skip[text[tpos]] > len_pattern - 1 - ppos) tpos += skip[text[tpos]]; // 次回の比較位置が前回の比較開始位置よりも後ろに移動する場合はスキップテーブルに従い移動
+    else tpos += len_pattern - ppos;                                         // 前に移動してしまう場合は前回の比較開始位置から1文字だけスキップ
 
-    ppos = pattern_len - 1;
+    ppos = len_pattern - 1;
   }
 
   clock_t t2 = clock(); // 計測終了
@@ -92,11 +105,7 @@ void BM(int filesize, char *text, char *pattern) {
 
 
 int main(int argc, char *argv[]) {
-  FILE *fp;
-  if ((fp = fopen(argv[1], "r")) == NULL) {
-    perror("File Open Error");
-    exit(EXIT_FAILURE);
-  }
+  FILE *fp = MyFopen(argv[1], "r");
 
   // ファイルサイズを計測する
   fpos_t filesize;
